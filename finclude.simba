@@ -26,7 +26,7 @@ var
   Multi: TStringArray;
   Toggle: Boolean;
 begin
-  NewFileName:= Reflect.Misc.GetPage('https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/internal/updating/Files.txt');
+  NewFileName:= Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/finclude/master/Files.txt');
   Multi:= MultiBetween(NewFileName, '(', ')');
   for I := 0 to High(Multi) do
   begin
@@ -48,19 +48,6 @@ begin
     end;
   end;
 
-  try
-    NewFileName := IncludePath + 'finclude\finclude.simba';
-    NewFile := Rewritefile(NewFileName, True);
-    WriteFileString(NewFile, Reflect.Misc.GetPage('https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/Reflection.Simba'));
-  except
-      Debug('Fatal error writing to ' + NewFileName);
-  finally
-    CloseFile(NewFile);
-    Debug('Update Completed.');
-    Debug('Please Restart Script.');
-    TerminateScript;
-  end;
-
 end;
 
 procedure FInclude;
@@ -78,18 +65,7 @@ begin
   If Not (finclude_rev = tInt)then
   begin
     Writeln('[f-Include] Updating f-Include to the latest version..');
-    DeleteFile(IncludePath + 'finclude.simba');
-    Writeln('[f-Include] Deleted old finclude file!');
-    try
-      NewFile := Rewritefile(IncludePath + 'finclude.simba', True);
-      WriteFileString(NewFile, Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/Versions/master/finclude.simba'));
-    except
-      Writeln('[ERROR] Failed updating');
-    finally
-      CloseFile(NewFile);
-      Writeln('[f-Include] Finished updating, restart script!');
-      TerminateScript;
-    end;
+    Update_fInclude;
   end else
     Writeln('[f-Include] Up to date!');
 

@@ -2,23 +2,26 @@
 #### -  Check for capital letters in the extension caused by git  - ####
 #### -           Reflection.Simba is not to be put here           - ####
 
+(finclude\finclude.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/finclude.simba)
+
 (finclude\global.simba)
-(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/Math.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/global.simba)
 
 (finclude\basics.simba)
-(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/Time.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/basics.simba)
 
 (finclude\debug.simba)
-(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/Compass.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/debug.simba)
 
 (finclude\walking.simba)
-(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/GroundItems.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/walking.simba)
 
 (finclude\interact.simba)
-(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/LocalPlayer.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/interact.simba)
 
 (finclude\breaking.simba)
-(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/Npc.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/breaking.simba)
 
 (finclude\handles.simba)
-(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/Objects.simba)
+(https://raw.githubusercontent.com/FittaVillavu/finclude/master/handles.simba)
