@@ -55,7 +55,9 @@ var
   S: String;
   NewFile, tInt: Integer;
 begin
-  S := Trim(Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/Versions/master/finclude.txt'));
+  initAL;
+  Reflect.Setup;
+  S := Trim(Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/finclude/master/version.txt'));
   Writeln(S);
   tInt := StrToIntDef(S, -1);
   Writeln('[f-Include] Current rev: ' + ToStr(finclude_rev) + '  Newest rev: ' + ToStr(tInt));
@@ -70,4 +72,5 @@ begin
     Writeln('[f-Include] Up to date!');
 
   Writeln('[f-Include] Starting ' + ScriptName + ' ' + ScriptRev);
+
 end;
