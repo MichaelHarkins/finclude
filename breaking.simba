@@ -1,0 +1,34 @@
+procedure TakeBreak(Time: Integer);
+var
+  Bmp, I: Integer;
+  Layer: TGraphics;
+  S: TStringArray;
+  T: Timer;
+begin
+  T.start;
+  Bmp := LoadBitmap(IncludePath + 'finclude/graphic/break.bmp');
+  repeat
+    If Not locPlayer.IsLoggedIn then
+    begin
+      S := ['           ' + ScriptName + ' v' + ScriptRev,
+            '',
+            'Time running: ' + msToTime(GetTimeRunning, TIME_SHORT),
+            'Total break was: ' + msToTime(Time, TIME_SHORT),
+            'Time left on break: ' + msToTime(Time-T.timeElapsed , TIME_SHORT)];
+
+      Layer := OS_Smart.Graphics;
+      Layer.Clear;
+
+      Layer.DrawBitmap(Bmp, Point(229, 193), False);
+      Layer.DrawClippedText('Breaking', 'BigChars', Point(308, 189), clYellow);
+      For I:=0 to High(S)do
+        Layer.DrawClippedText(S[I], 'UpChars07', Point(250, 235+(I*14)), clYellow);
+
+      Wait(4000+Random(7000));
+    end else
+      Wait(3000+Random(3000));
+  until(T.timeElapsed >  Time);
+  Layer := OS_Smart.Graphics;
+  Layer.Clear;
+  FreeBitmap(Bmp);
+end;

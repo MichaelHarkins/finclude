@@ -1,0 +1,30 @@
+procedure Debug_screen(log: string);
+begin
+  if (not directoryExists(ScriptPath + 'debug\')) then
+    forceDirectories(ScriptPath + 'debug\');
+
+  try
+    saveScreenshot(ScriptPath + 'debug\' + theDate(DATE_FORMAL) + ', ' + log + '.png');
+  except
+    Writeln('Failed to save screenshot of: ' + log);
+  end;
+end;
+
+Procedure Debug(Comment: String; Error: Boolean = False);
+var
+  S: String;
+begin
+  If Failed then
+    Exit;
+  Failed := Error;
+
+  If Error then
+  begin
+    Debug_screen(Comment);
+    S := '[ERROR] ';
+    ShowBalloonHint(ScriptName, Comment, 10000, bfInfo);
+  end else
+    S := '[' + msToTime(GetTimeRunning, TIME_SHORT) + '] ';
+
+  Writeln(S + Comment);
+end;

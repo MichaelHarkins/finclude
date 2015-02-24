@@ -1,0 +1,24 @@
+#### - This File contains the path & filename followed by the URL - ####
+#### -  Check for capital letters in the extension caused by git  - ####
+#### -           Reflection.Simba is not to be put here           - ####
+
+(finclude\global.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/Math.simba)
+
+(finclude\basics.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/Time.simba)
+
+(finclude\debug.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/Compass.simba)
+
+(finclude\walking.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/GroundItems.simba)
+
+(finclude\interact.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/LocalPlayer.simba)
+
+(finclude\breaking.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/Npc.simba)
+
+(finclude\handles.simba)
+(https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/core/renderable/Objects.simba)

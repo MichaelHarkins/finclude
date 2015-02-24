@@ -1,0 +1,7 @@
+var
+  Failed: Boolean;
+  ScriptName, ScriptRev: String;
+  locPlayer: TReflectLocalPlayer;
+  BreakTaken, DoneRound, Limit, Done: Integer;
+  ProgressTimer: Timer;
+  BreakList: TIntegerArray;

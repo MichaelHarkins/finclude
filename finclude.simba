@@ -1,0 +1,97 @@
+{
+  _____         .__              .__            .___
+_/ ____\        |__| ____   ____ |  |  __ __  __| _/____
+\   __\  ______ |  |/    \_/ ___\|  | |  |  \/ __ |/ __ \
+ |  |   /_____/ |  |   |  \  \___|  |_|  |  / /_/ \  ___/
+ |__|           |__|___|  /\___  >____/____/\____ |\___  >
+                        \/     \/                \/    \/
+}
+{$i AeroLib/AeroLib.Simba}
+{$i Reflection/Reflection.simba}
+{$i finclude/global.simba}
+{$i finclude/basics.simba}
+{$i finclude/debug.simba}
+{$i finclude/walking.simba}
+{$i finclude/interact.simba}
+{$i finclude/breaking.simba}
+{$i finclude/handles.simba}
+
+const
+  finclude_rev = 1;
+
+procedure Update_fInclude;
+var
+  NewFile, I: Integer;
+  OnlineVersion, NewFileName, ChangeLog: string;
+  Multi: TStringArray;
+  Toggle: Boolean;
+begin
+  NewFileName:= Reflect.Misc.GetPage('https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/lib/internal/updating/Files.txt');
+  Multi:= MultiBetween(NewFileName, '(', ')');
+  for I := 0 to High(Multi) do
+  begin
+    if not(Toggle) then
+    begin
+      NewFileName := IncludePath + Multi[I];
+      Toggle := True;
+    end else
+    begin
+      try
+        NewFile := Rewritefile(NewFileName, true);
+        WriteFileString(NewFile, Reflect.Misc.GetPage(Multi[I]));
+      except
+          Debug('Fatal error writing to ' + NewFileName);
+      finally
+        CloseFile(NewFile);
+      end;
+      Toggle:= False;
+    end;
+  end;
+
+  try
+    NewFileName := IncludePath + 'finclude\finclude.simba';
+    NewFile := Rewritefile(NewFileName, True);
+    WriteFileString(NewFile, Reflect.Misc.GetPage('https://raw.githubusercontent.com/Elfyyy/OSR-Reflection/master/Reflection.Simba'));
+  except
+      Debug('Fatal error writing to ' + NewFileName);
+  finally
+    CloseFile(NewFile);
+    Debug('Update Completed.');
+    Debug('Please Restart Script.');
+    TerminateScript;
+  end;
+
+end;
+
+procedure FInclude;
+var
+  S: String;
+  NewFile, tInt: Integer;
+begin
+  S := Trim(Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/Versions/master/finclude.txt'));
+  Writeln(S);
+  tInt := StrToIntDef(S, -1);
+  Writeln('[f-Include] Current rev: ' + ToStr(finclude_rev) + '  Newest rev: ' + ToStr(tInt));
+  If tInt = -1 then
+    Exit;
+
+  If Not (finclude_rev = tInt)then
+  begin
+    Writeln('[f-Include] Updating f-Include to the latest version..');
+    DeleteFile(IncludePath + 'finclude.simba');
+    Writeln('[f-Include] Deleted old finclude file!');
+    try
+      NewFile := Rewritefile(IncludePath + 'finclude.simba', True);
+      WriteFileString(NewFile, Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/Versions/master/finclude.simba'));
+    except
+      Writeln('[ERROR] Failed updating');
+    finally
+      CloseFile(NewFile);
+      Writeln('[f-Include] Finished updating, restart script!');
+      TerminateScript;
+    end;
+  end else
+    Writeln('[f-Include] Up to date!');
+
+  Writeln('[f-Include] Starting ' + ScriptName + ' ' + ScriptRev);
+end;

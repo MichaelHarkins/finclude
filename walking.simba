@@ -1,0 +1,89 @@
+procedure waitTillTile(Tile: TPoint);
+var
+  P: TPoint;
+  T: Timer;
+  tInt: Integer;
+begin
+  tInt := 3500+Random(501);
+  T.start;
+  repeat
+    wait(100+Random(100));
+    P := locPlayer.GetTile;
+    If locPlayer.isMoving then
+      T.start;
+
+    If T.timeElapsed > tInt then
+      Exit;
+  until((P.X = Tile.X)and(P.Y = Tile.Y));
+end;
+
+procedure waitDistance(Tile: TPoint; Dist: Integer);
+begin
+  if Not locPlayer.isMoving then
+    Wait(500+Random(200));
+  repeat
+    beHuman(800);
+    handle_Run;
+    Wait(100+Random(200));
+  until(Not locPlayer.IsMoving)or(Reflect.Tiles.DistanceFromTile(Tile) <= Dist);
+end;
+
+procedure waitWalking;
+var
+  I: Integer;
+begin
+  repeat
+    beHuman(400);
+    Wait(200+Random(200));
+  until(Not locPlayer.IsMoving);
+  Wait(500+Random(200));
+end;
+
+function walkTowards(Tile: TTile; Dist: Integer): Boolean;
+var
+  I, Tries: Integer;
+  OurTile, DestTile: TTile;
+  CTRLPoints: TTileArray;
+begin
+  If (Not isLoggedIn)or(Failed)then
+    Exit;
+
+  repeat
+    OurTile := locPlayer.GetTile;
+    CtrlPoints := Reflect.Map.WindPath(OurTile.x, OurTile.y, Tile.x, Tile.y, 5.0, 2.5, 0.0, 0.0, 1.5, 1.0);
+    Inc(Tries);
+    if(Tries > 20)then
+      Exit;
+    for I:= High(CtrlPoints) downto 0 do
+      if TReflectLocalPlayer.WalkToTileMM(CtrlPoints[I]) then
+      begin
+        afterClick;
+        waitDistance(CtrlPoints[I], Dist);
+        Result := Reflect.Tiles.DistanceFromTile(Tile) <= Dist;
+        Break;
+      end;
+  until(Result);
+end;
+
+function walkControlPoints(ControlPoints: TPointArray; MaxRange: Integer; DistUntilNext: Integer = 8): boolean;
+var
+  Ind: Integer;
+begin
+  If (Not isLoggedIn)or(Failed)then
+    Exit;
+
+  repeat
+    If Length(ControlPoints) = Ind then
+        Exit(True);
+
+    If not (Reflect.Tiles.DistanceFromTile(ControlPoints[Ind]) >= MaxRange) then
+    begin
+      If walkTowards(ControlPoints[Ind], DistUntilNext)then
+        Ind := Ind + 1
+      else
+        Exit(False);
+    end else
+      Exit(False);
+
+  until(Result);
+end;
