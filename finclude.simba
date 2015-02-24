@@ -48,6 +48,9 @@ begin
     end;
   end;
 
+  Debug('Update Completed.');
+  Debug('Please Restart Script.');
+  TerminateScript;
 end;
 
 procedure FInclude;
