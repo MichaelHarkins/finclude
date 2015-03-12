@@ -11,6 +11,46 @@ begin
   Result := Round((3600*(I))/(GetTimeRunning/1000));
 end;
 
+function getMousePnt(): TPoint;
+var
+  x,y : integer;
+begin
+  getMousePos(X, Y);
+  Result := Point(X, Y);
+end;
+
+{*******************************************************************************
+function ConvertXpToLvl(Xp: Integer): Integer;
+By: Brak, Flyboy
+Description: Returns skill level based on xp level
+*******************************************************************************}
+function convertXpToLvl(xp: Integer): Integer;
+var
+  level, exp: Integer;
+begin
+  for level := 1 to 99 do
+  begin
+    exp := exp + Trunc(level + 300 * Pow(2.0, level / 7.0));
+    if ((exp / 4) > xp) then
+      exit(level);
+  end;
+  Result := 99;
+end;
+
+{*******************************************************************************
+function ConvertLvlToXP(Xp: Integer): Integer;
+By: Ron
+Description: Returns exp based on level
+*******************************************************************************}
+function convertLvlToXP(Level: Integer): Integer;
+var
+  i, exp: Integer;
+begin
+  for i := 1 to Level do
+    exp := exp + Trunc(i + 300 * Pow(2.0, i / 7.0));
+  Result := exp div 4;
+end;
+
 function TillLevel(CurrentXP: Integer): Integer;
 begin
   Result := ConvertLvlToXP(ConvertXpToLvl(CurrentXP))-CurrentXP;
@@ -21,7 +61,7 @@ var
   Keys: TIntegerArray;
   I: Integer;
 begin
-  If (Not isLoggedIn)or(Failed)then
+  If (Not locPlayer.isLoggedIn)or(Failed)then
     Exit;
 
   Keys := [VK_RIGHT, VK_LEFT];
@@ -34,33 +74,61 @@ begin
   Wait(200 + random(350));
 end;
 
-procedure mouseHandle(B: TBox; mouse_type: Integer);
-begin
-  If Not mouseInBox(B)then
-    MouseBox(B, mouse_Type)
-  else
-  if Random(2) = 0 then
-    fastClick(mouse_Type)
-  else
-    MouseBox(B, mouse_Type);
-end;
-
 procedure handle_Run;
 begin
   if locPlayer.GetRunEnergy > 10 then
    If Not locPlayer.IsRunOn then
-     MouseBox(IntToBox(547, 134, 589, 147), Mouse_Left);
+     Reflect.Mouse.Move(IntToBox(547, 134, 589, 147), Mouse_Left);
+end;
+
+function FTab(Tab: Integer): boolean;
+var
+  T: TReflectTimer;
+  F: integer;
+begin
+  if not locPlayer.isLoggedIn then
+    Exit(False);
+
+  if (Reflect.Gametab.Current = Tab) then
+    Exit(True);
+
+  case Tab of
+{ LogOut Does not have a key AFAIK }
+    GameTab_CombatOptions : F := 1;
+    GameTab_Stats         : F := 2;
+    GameTab_QuestList     : F := 3;
+    GameTab_Inventory     : F := -84;
+    Gametab_WornEquipment : F := 4;
+    GameTab_Prayer        : F := 5;
+    GameTab_Magic         : F := 6;
+    GameTab_Clanchat      : F := 7;
+    Gametab_FriendsList   : F := 8;
+    Gametab_IgnoreList    : F := 9;
+    GameTab_Options       : F := 10;
+    Gametab_Emotes        : F := 11;
+    Gametab_MusicPlayer   : F := 12;
+  end;
+
+  T.start();
+  repeat
+    Reflect.KeyBoard.TypeKey(111+F);
+    Wait(150+random(100));
+    Result := Reflect.Gametab.Current = Tab;
+  until (Result)or(T.elapsedTime() > 1000);
+
+  if (not Result) then
+    Result := Reflect.Gametab.Open(Tab);
 end;
 
 {Simulates a mixture of clicking a tab and using the F keys}
 function Tab(i: integer): boolean;
 begin
-  If (Not isLoggedIn)or(Failed) then
+  If (Not locPlayer.isLoggedIn)or(Failed) then
     Exit;
 
   Case Random(8)of
     0: Result := FTab(I);
-    1..7: Result := gameTab(I);
+    1..7: Result := Reflect.GameTab.Open(I);
   end;
 end;
 
@@ -91,9 +159,7 @@ begin
   Case Random(I)of
     0..3: mouseOffScreen;
     4..9: randomCompass;
-    10: randomFKeys(True);
     12..16: SleepAndMoveMouse(200+Random(2000));
-    17: randomRClick;
   end;
 end;
 

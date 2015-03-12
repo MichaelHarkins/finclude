@@ -1,9 +1,9 @@
 procedure TakeBreak(Time: Integer);
 var
   Bmp, I: Integer;
-  Layer: TGraphics;
+  Layer: TReflectionGraphics;
   S: TStringArray;
-  T: Timer;
+  T: TReflectTimer;
 begin
   T.start;
   Bmp := LoadBitmap(IncludePath + 'finclude/graphic/break.bmp');
@@ -12,11 +12,11 @@ begin
     begin
       S := ['           ' + ScriptName + ' v' + ScriptRev,
             '',
-            'Time running: ' + msToTime(GetTimeRunning, TIME_SHORT),
-            'Total break was: ' + msToTime(Time, TIME_SHORT),
-            'Time left on break: ' + msToTime(Time-T.timeElapsed , TIME_SHORT)];
+            'Time running: ' + Reflect.Time.msToTime(GetTimeRunning, TIME_SHORT),
+            'Total break was: ' + Reflect.Time.msToTime(Time, TIME_SHORT),
+            'Time left on break: ' + Reflect.Time.msToTime(Time-T.Elapsedtime , TIME_SHORT)];
 
-      Layer := OS_Smart.Graphics;
+      Layer := Reflect.Smart.Graphics;
       Layer.Clear;
 
       Layer.DrawBitmap(Bmp, Point(229, 193), False);
@@ -27,8 +27,8 @@ begin
       Wait(4000+Random(7000));
     end else
       Wait(3000+Random(3000));
-  until(T.timeElapsed >  Time);
-  Layer := OS_Smart.Graphics;
+  until(T.Elapsedtime >  Time);
+  Layer := Reflect.Smart.Graphics;
   Layer.Clear;
   FreeBitmap(Bmp);
 end;

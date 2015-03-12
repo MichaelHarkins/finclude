@@ -1,16 +1,19 @@
+const
+  Mouse_MOVE = 3;
+
 function interact(B: TBox; UpText, Option: String; clickType: Integer): boolean;
 begin
-  If (Not isLoggedIn)or(Failed) then
+  If (Not locPlayer.isLoggedIn)or(Failed) then
     Exit;
 
-  mouseHandle(B, MOUSE_MOVE);
+  Reflect.Mouse.Move(B);
 
   If Reflect.Text.IsUpText(UpText, 50+Random(25))then
   begin
     If clickType = MOUSE_MOVE then
       Exit(True);
 
-    Mouse(getMousePnt, 0, 0, clickType);
+    Reflect.Mouse.Move(getMousePnt, 0, 0, clickType);
     If (clickType = mouse_Right)and(Reflect.Text.ChooseOption(Option, 200+Random(100)))then
       Exit(True) else
     If (clickType = mouse_Left)then
@@ -21,7 +24,35 @@ begin
     If Reflect.Text.IsUpText('Walk here')then
       Exit;
     Debug('Looked for "' + UpText + '" in "' + Reflect.Text.GetUpText + '" -> Trying to right click..', False);
-    Mouse(getMousePnt, 0, 0, Mouse_Right);
+    Reflect.Mouse.Move(getMousePnt, 0, 0, Mouse_Right);
+    Result := Reflect.Text.ChooseOption(Option, 200+Random(100));
+  end;
+end;
+
+function interact(P: TPoint; UpText, Option: String; clickType: Integer): boolean; overload;
+begin
+  If (Not locPlayer.isLoggedIn)or(Failed) then
+    Exit;
+
+  Reflect.Mouse.Move(P, 0, 0);
+
+  If Reflect.Text.IsUpText(UpText, 50+Random(25))then
+  begin
+    If clickType = MOUSE_MOVE then
+      Exit(True);
+
+    Reflect.Mouse.Move(getMousePnt, 0, 0, clickType);
+    If (clickType = mouse_Right)and(Reflect.Text.ChooseOption(Option, 200+Random(100)))then
+      Exit(True) else
+    If (clickType = mouse_Left)then
+      Exit(True);
+
+  end else
+  begin
+    If Reflect.Text.IsUpText('Walk here')then
+      Exit;
+    Debug('Looked for "' + UpText + '" in "' + Reflect.Text.GetUpText + '" -> Trying to right click..', False);
+    Reflect.Mouse.Move(getMousePnt, 0, 0, Mouse_Right);
     Result := Reflect.Text.ChooseOption(Option, 200+Random(100));
   end;
 end;
@@ -30,14 +61,12 @@ function interactTileOnce(Tile: TPoint; UpText, Option: String; Volume, clickTyp
 var
   P: TPoint;
 begin
-  If (Not isLoggedIn)or(Failed)or(Not TReflectionMap.TileOnMM(Tile))then
+  If (Not locPlayer.isLoggedIn)or(Failed)or(Not TReflectionMap.TileOnMM(Tile))then
     Exit;
 
   If Not TileOnMS(Tile)then
   begin
     Debug('Tile not on MS -> Walking..', False);
-    If C > 1 then
-      randomCompass;
     locPlayer.WalkToTileMM(Tile);
     Wait(250+Random(200));
     waitDistance(Tile, 1);
@@ -58,7 +87,7 @@ var
   P: TPoint;
   C: Integer;
 begin
-  If (Not isLoggedIn)or(Failed)or(Not TReflectionMap.TileOnMM(Tile))then
+  If (Not locPlayer.isLoggedIn)or(Failed)or(Not TReflectionMap.TileOnMM(Tile))then
     Exit;
 
   repeat
@@ -76,7 +105,7 @@ var
   Inv: TReflectInvItemArray;
   I: Integer;
 begin
-  If (Not isLoggedIn)or(Failed)then
+  If (Not locPlayer.isLoggedIn)or(Failed)then
     Exit;
 
   Inv.GetAll;
@@ -84,9 +113,8 @@ begin
     If InIntArray(IDs, Inv[I].GetID)then
     begin
       Debug('Correct ID found', False);
-      If Not Tab(TAB_INV)then
-        Exit;
-      if Interact(invBox(Inv[I].GetInvSlot), Option, Option, mouse_Left)then
+      Tab(GameTab_Inventory);
+      if Interact(Inv[I].GetPoint, Option, Option, mouse_Left)then
         Exit(True);
     end;
 end;
@@ -96,17 +124,17 @@ var
   Inv: TReflectInvItemArray;
   I: Integer;
 begin
-  If (Not isLoggedIn)or(Failed)then
+  If (Not locPlayer.isLoggedIn)or(Failed)then
     Exit;
 
   Inv.GetAll;
   For I:=0 to High(Inv)do
-    If InStrArr(Inv[I].GetName, Names, True)then
+    If IsStrInArr(Inv[I].GetName, False, Names)then
     begin
       Debug('Correct name found', False);
-      If Not Tab(TAB_INV)then
+      If Not Tab(Gametab_Inventory)then
         Exit;
-      if Interact(invBox(Inv[I].GetInvSlot), Option, Option, mouse_Left)then
+      if Interact(Inv[I].GetMSPoint, Option, Option, mouse_Left)then
         Exit(True);
     end;
 end;
@@ -114,13 +142,13 @@ end;
 function findBank(BankBooths: TPointArray; UpText, Option: String): boolean;
 var
   Booths: TPointArray;
-  CT: Timer;
+  CT: TReflectTimer;
   timeOut: Integer;
 begin
-  If (Not isLoggedIn)or(Failed) then
+  If (Not locPlayer.isLoggedIn)or(Failed) then
     Exit;
 
-  If IsBankOpen then
+  If Reflect.Bank.isOpen then
     Exit(True);
 
   Booths := BankBooths;
@@ -134,16 +162,16 @@ begin
     repeat
       Wait(300+Random(200));
       Result := (Reflect.Bank.IsOpen)or(Reflect.Bank.IsPinOpen);
-    until(Result)or(CT.timeElapsed > timeOut);
+    until(Result)or(CT.Elapsedtime > timeOut);
 
-    If (CT.timeElapsed > timeOut) then
+    If (CT.Elapsedtime > timeOut) then
       Exit;
 
     locPlayer.EnterPin;
     CT.start;
     repeat
       Wait(175+Random(80));
-    until(Reflect.Bank.IsOpen)or(CT.timeElapsed > timeOut);
+    until(Reflect.Bank.IsOpen)or(CT.Elapsedtime > timeOut);
   end else
     randomCompass;
 end;

@@ -1,0 +1,70 @@
+procedure SleepAndMoveMouse(Time: Integer);
+var
+  Moving: Boolean;
+  mx, my: Integer;
+  x, y, xv, yv: Extended;
+  gx, gy: Extended;
+  T: Integer;
+begin
+  GetMousePos(mx, my);
+  x := mx;
+  y := my;
+  if (Random(2) = 0) then
+    Moving := False
+  else
+    Moving := True;
+  gx := 130 + Random(500);
+  gy := 130 + Random(300);
+  T := GetTickCount;
+  repeat
+    Sleep(10);
+    if (Moving) then
+    begin
+      if (gx > x) then
+        xv := xv + 0.1
+      else
+        xv := xv - 0.1;
+      if (gy > y) then
+        yv := yv + 0.1
+      else
+        yv := yv - 0.1;
+      x := x + xv;
+      y := y + yv;
+      MoveMouse(Round(x), Round(y));
+    end;
+    if (Random(100) = 0) then
+      Moving := not Moving;
+    if (Random(30) = 0) then
+    begin
+      gx := 130 + Random(500);
+      gy := 130 + Random(300);
+    end;
+  until (Abs(GetTickCount - T) >= Time);
+end;
+
+procedure MMouseOffClient(Direction: String);
+var
+  B: TBoxArray;
+  P: TPoint;
+  i, W, H: Integer;
+begin
+  GetClientDimensions(W, H);
+  SetArrayLength(B, 4);
+  B[0] := IntToBox(-300, -300, W, 0); //top
+  B[1] := IntToBox(0, H, W, H +300); //bottom
+  B[2] := IntToBox(0-300, 0, 0, H); //left
+  B[3] := IntToBox(W, 0, W +300, H); //right
+
+  case Lowercase(Direction) of
+    'top': i := 0;
+    'bottom':  i := 1;
+    'left': i := 2;
+    'right': i := 3;
+    'rand', 'random': i := Random(4);
+    else
+      Writeln('Wrong direction');
+  end;
+
+  P := Point(RandomRange(B[i].X1, B[i].X2), RandomRange(B[i].Y1, B[i].Y2));
+  Reflect.Mouse.Move(P, 0, 0);
+end;

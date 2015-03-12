@@ -6,9 +6,10 @@ _/ ____\        |__| ____   ____ |  |  __ __  __| _/____
  |__|           |__|___|  /\___  >____/____/\____ |\___  >
                         \/     \/                \/    \/
 }
-{$i AeroLib/AeroLib.Simba}
+
 {$i Reflection/Reflection.simba}
 {$i finclude/global.simba}
+{$i finclude/antiban.simba}
 {$i finclude/basics.simba}
 {$i finclude/debug.simba}
 {$i finclude/walking.simba}
@@ -58,7 +59,6 @@ var
   S: String;
   NewFile, tInt: Integer;
 begin
-  initAL;
   Reflect.Setup;
   S := Trim(Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/finclude/master/version.txt'));
   Writeln(S);

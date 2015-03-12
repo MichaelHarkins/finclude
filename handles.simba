@@ -1,0 +1,26 @@
+function waitForFunction(Func: function: Boolean; WaitPerLoop, MaxTime: Integer): Boolean;
+var
+  T: TReflectTimer;
+begin
+  T.start();
+  while (T.Elapsedtime < MaxTime) do
+  begin
+    if (Func()) then
+      Exit(True);
+    Wait(WaitPerLoop);
+  end;
+end;
+
+function waitForColor(X, Y, Color, MaxTime: Integer): Boolean;
+var
+  T: TReflectTimer;
+begin
+  Result := False;
+  T.start;
+  while T.Elapsedtime < MaxTime do
+  begin
+    if (getColor(X, Y) = Color) then
+      Exit(True);
+    Wait(5 + Random(6));
+  end;
+end;

@@ -4,7 +4,7 @@ begin
     forceDirectories(ScriptPath + 'debug\');
 
   try
-    saveScreenshot(ScriptPath + 'debug\' + theDate(DATE_FORMAL) + ', ' + log + '.png');
+    saveScreenshot(ScriptPath + 'debug\' + Reflect.Time.theDate(DATE_FORMAL) + ', ' + log + '.png');
   except
     Writeln('Failed to save screenshot of: ' + log);
   end;
@@ -24,7 +24,7 @@ begin
     S := '[ERROR] ';
     ShowBalloonHint(ScriptName, Comment, 10000, bfInfo);
   end else
-    S := '[' + msToTime(GetTimeRunning, TIME_SHORT) + '] ';
+    S := '[' + Reflect.Time.msToTime(GetTimeRunning, TIME_SHORT) + '] ';
 
   Writeln(S + Comment);
 end;
