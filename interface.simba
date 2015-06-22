@@ -1,19 +1,21 @@
-function Interface_GetText(Parent, Child: Integer): String;
-var
-  W: TReflectWidget;
+function Interface_LevelUp: boolean;
 begin
-  W.GetWidget(Parent, Child);
-  Result := W.GetText;
-  W.Free;
+  Result := Pos('ongratulations', Reflect.Widget.GetText(233, 0)) > 0;
 end;
 
-function Interface_GetChildText(Parent, Child, Grandchild: Integer): String;
+function Interface_TaskDone: Boolean;
 var
-  W, WChild: TReflectWidget;
+  I: Integer;
+  S: String;
 begin
-  W.GetWidget(Parent, Child);
-  WChild.GetChild(W, Grandchild);
-  Result := WChild.GetText;
-  W.Free;
-  WChild.Free;
+  Result := False
+  For I:=0 to 10 do
+  begin
+    S := Reflect.Widget.GetText(162, 43, I);
+    If (Pos('in a row and received', S) > 0)then
+    begin
+      Debug(S);
+      Exit(True);
+    end;
+  end;
 end;

@@ -2,3 +2,12 @@ function TileOnMS(Tile: TPoint): Boolean;
 begin
   Result := PointInBox(Reflect.Tiles.TileToMS(Tile), intToBox(MSX1, MSY1, MSX2, MSY2));
 end;
+
+function TileInAreas(Tile: TTile; Areas: TBoxArray): boolean;
+var
+  I: Integer;
+begin
+  For I:=0 to High(Areas)do
+    If PointInBox(Tile, Areas[I])then
+      Exit(True);
+end;
