@@ -2,6 +2,6 @@ var
   Failed: Boolean;
   ScriptName, ScriptRev: String;
   locPlayer: TReflectLocalPlayer;
-  BreakTaken, DoneRound, Limit, Done: Integer;
+  BreakTaken: Integer;
   ProgressTimer: TReflectTimer;
-  BreakList: TIntegerArray;
+  Mail_Action: Integer;

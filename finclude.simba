@@ -7,73 +7,47 @@ _/ ____\        |__| ____   ____ |  |  __ __  __| _/____
                         \/     \/                \/    \/
 }
 
+{$DEFINE finclude}
+
 {$i Reflection/Reflection.simba}
-{$i finclude/global.simba}
-{$i finclude/antiban.simba}
-{$i finclude/basics.simba}
-{$i finclude/debug.simba}
-{$i finclude/walking.simba}
-{$i finclude/interact.simba}
-{$i finclude/breaking.simba}
-{$i finclude/handles.simba}
+{$i finclude/Socks.simba}
+{$i finclude/MailSetup.simba}
+{$i finclude/Global.simba}
+{$i finclude/Math.simba}
+{$i finclude/Tiles.simba}
+{$i finclude/Basics.simba}
+{$i finclude/Antiban.simba}
+{$i finclude/Debug.simba}
+{$i finclude/Interface.simba}
+{$i finclude/Walking.simba}
+{$i finclude/Interact.simba}
+{$i finclude/Breaking.simba}
+{$i finclude/Handles.simba}
 
 const
   finclude_rev = 1;
 
-procedure Update_fInclude;
-var
-  NewFile, I: Integer;
-  OnlineVersion, NewFileName, ChangeLog: string;
-  Multi: TStringArray;
-  Toggle: Boolean;
+procedure mailTerminate;
 begin
-  NewFileName:= Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/finclude/master/Files.txt');
-  Multi:= MultiBetween(NewFileName, '(', ')');
-  for I := 0 to High(Multi) do
-  begin
-    if not(Toggle) then
-    begin
-      NewFileName := IncludePath + Multi[I];
-      Toggle := True;
-    end else
-    begin
-      try
-        NewFile := Rewritefile(NewFileName, true);
-        WriteFileString(NewFile, Reflect.Misc.GetPage(Multi[I]));
-      except
-          Debug('Fatal error writing to ' + NewFileName);
-      finally
-        CloseFile(NewFile);
-      end;
-      Toggle:= False;
-    end;
-  end;
-
-  Debug('Update Completed.');
-  Debug('Please Restart Script.');
-  TerminateScript;
+  SendEmail(Mail_URL,
+            Mail_Username,
+            Mail_Password,
+            Mail_Name,
+            Mail_Recipient,
+            locPlayer.Username,
+            locPlayer.Username + ' has failed ' + Reflect.Time.TheDate(DATE_FORMAL) + ' ' + getLocalTime);
 end;
 
 procedure FInclude;
-var
-  S: String;
-  NewFile, tInt: Integer;
 begin
   Reflect.Setup;
-  S := Trim(Reflect.Misc.GetPage('https://raw.githubusercontent.com/FittaVillavu/finclude/master/version.txt'));
-  Writeln(S);
-  tInt := StrToIntDef(S, -1);
-  Writeln('[f-Include] Current rev: ' + ToStr(finclude_rev) + '  Newest rev: ' + ToStr(tInt));
-  If tInt = -1 then
-    Exit;
-
-  If Not (finclude_rev = tInt)then
+  Writeln('[f-Include] Current rev: ' + ToStr(finclude_rev));
+  If Mail_Action > 0 then
   begin
-    Writeln('[f-Include] Updating f-Include to the latest version..');
-    Update_fInclude;
-  end else
-    Writeln('[f-Include] Up to date!');
-
-  Writeln('[f-Include] Starting ' + ScriptName + ' ' + ScriptRev);
-
+    Writeln('[f-Include] Mail-Alert: ON');
+    If Mail_Action = mail_AtTerminate then
+      AddOnTerminate('mailTerminate');
+  end;
+  If Not (ScriptName = '')then
+    Writeln('[f-Include] Starting ' + ScriptName + ' ' + ScriptRev);
 end;

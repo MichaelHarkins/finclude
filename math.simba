@@ -1,0 +1,39 @@
+function perHour(I: Integer): integer;
+begin
+  Result := Round((3600*(I))/(GetTimeRunning/1000));
+end;
+
+function getMousePnt(): TPoint;
+var
+  x,y : integer;
+begin
+  getMousePos(X, Y);
+  Result := Point(X, Y);
+end;
+
+function convertXpToLvl(xp: Integer): Integer;
+var
+  level, exp: Integer;
+begin
+  for level := 1 to 99 do
+  begin
+    exp := exp + Trunc(level + 300 * Pow(2.0, level / 7.0));
+    if ((exp / 4) > xp) then
+      exit(level);
+  end;
+  Result := 99;
+end;
+
+function convertLvlToXP(Level: Integer): Integer;
+var
+  i, exp: Integer;
+begin
+  for i := 1 to Level do
+    exp := exp + Trunc(i + 300 * Pow(2.0, i / 7.0));
+  Result := exp div 4;
+end;
+
+function TillLevel(CurrentXP: Integer): Integer;
+begin
+  Result := ConvertLvlToXP(ConvertXpToLvl(CurrentXP))-CurrentXP;
+end;

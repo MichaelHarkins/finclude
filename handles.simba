@@ -24,3 +24,47 @@ begin
     Wait(5 + Random(6));
   end;
 end;
+
+function getItemAmount(Pnt: TPoint): Integer;
+var
+  Box  : TBox;
+  S    : String;
+  i    : Integer;
+  TPA  : TPointArray;
+  ATPA : T2DPointArray;
+  Col  : TIntegerArray;
+begin
+  Result := 0;
+
+  Box := IntToBox(0,0,755,500);
+  if not pointInBox(Pnt, Box) then
+    Exit;
+  Box := IntToBox(Pnt.X-32,Pnt.Y-32,Pnt.X+32,Pnt.Y+32);
+  if not FindColors(TPA, 65536, Box.X1, Box.Y1, Box.X2, Box.Y2) then
+    Exit;
+
+  Inc(Result);
+  ATPA := clusterTPA(TPA, 5);
+  if length(ATPA) < 1 then
+    Exit;
+  SortATPAFromMidPoint(ATPA, Pnt);
+
+  Box  := getTPABounds(ATPA[0]);
+  Col  := [65535, 65278, 16777215, 8453888]; // Yellow, white, green and ...?
+  Pnt  := Point(round((Box.X1+Box.X2)/2), Box.Y1);
+  Box  := IntToBox(Pnt.x-20, Pnt.y-15, Pnt.x+20, Pnt.y+15);
+  TPA  := [];
+  ATPA := [];
+
+  for i:=0 to High(Col) do
+    if FindColors(TPA, Col[I], Box.X1, Box.Y1, Box.X2, Box.Y2) then
+    begin
+      S := getTextAtEx(Box.X1, Box.Y1, Box.X2, Box.Y2, 0, 1, 1, Col[i], 0, 'StatChars07');
+      Result := strToIntDef(ExtractFromStr(S, Numbers), 1);
+      Case I of
+        2: Result := Result * 1000;
+        3: Result := Result * 1000000;
+      end;
+      Exit;
+    end;
+end;

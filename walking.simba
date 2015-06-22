@@ -50,7 +50,7 @@ begin
 
   repeat
     OurTile := locPlayer.GetTile;
-    CtrlPoints := Reflect.Map.WindPath(OurTile.x, OurTile.y, Tile.x, Tile.y, 5.0, 2.5, 0.0, 0.0, 1.5, 1.0);
+    CtrlPoints := Reflect.Map.WindPath(OurTile.x, OurTile.y, Tile.x, Tile.y, 8.0, 2.5, 0.0, 0.0, 1.5, 1.0);
     Inc(Tries);
     if(Tries > 20)then
       Exit;

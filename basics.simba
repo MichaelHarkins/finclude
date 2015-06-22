@@ -1,79 +1,6 @@
-function TileOnMS(Tile: TPoint): Boolean;
-var
-  Point: TPoint;
-begin
-  Point := Reflect.Tiles.TileToMS(Tile);
-  Result := PointInBox(Point, intToBox(MSX1, MSY1, MSX2, MSY2));
-end;
-
-function perHour(I: Integer): integer;
-begin
-  Result := Round((3600*(I))/(GetTimeRunning/1000));
-end;
-
-function getMousePnt(): TPoint;
-var
-  x,y : integer;
-begin
-  getMousePos(X, Y);
-  Result := Point(X, Y);
-end;
-
-{*******************************************************************************
-function ConvertXpToLvl(Xp: Integer): Integer;
-By: Brak, Flyboy
-Description: Returns skill level based on xp level
-*******************************************************************************}
-function convertXpToLvl(xp: Integer): Integer;
-var
-  level, exp: Integer;
-begin
-  for level := 1 to 99 do
-  begin
-    exp := exp + Trunc(level + 300 * Pow(2.0, level / 7.0));
-    if ((exp / 4) > xp) then
-      exit(level);
-  end;
-  Result := 99;
-end;
-
-{*******************************************************************************
-function ConvertLvlToXP(Xp: Integer): Integer;
-By: Ron
-Description: Returns exp based on level
-*******************************************************************************}
-function convertLvlToXP(Level: Integer): Integer;
-var
-  i, exp: Integer;
-begin
-  for i := 1 to Level do
-    exp := exp + Trunc(i + 300 * Pow(2.0, i / 7.0));
-  Result := exp div 4;
-end;
-
-function TillLevel(CurrentXP: Integer): Integer;
-begin
-  Result := ConvertLvlToXP(ConvertXpToLvl(CurrentXP))-CurrentXP;
-end;
-
-procedure randomCompass;
-var
-  Keys: TIntegerArray;
-  I: Integer;
-begin
-  If (Not locPlayer.isLoggedIn)or(Failed)then
-    Exit;
-
-  Keys := [VK_RIGHT, VK_LEFT];
-  I := Random(2);
-
-  Wait(100 + random(50));
-  KeyDown(Keys[I]);
-  Wait(500 + random(1000));
-  KeyUp(Keys[I]);
-  Wait(200 + random(350));
-end;
-
+{
+Turns run on if energy is higher than 10.
+}
 procedure handle_Run;
 begin
   if locPlayer.GetRunEnergy > 10 then
@@ -81,6 +8,11 @@ begin
      Reflect.Mouse.Move(IntToBox(547, 134, 589, 147), Mouse_Left);
 end;
 
+{
+Changes tab using FKeys.
+
+Example: FTab(Gametab_Prayer);
+}
 function FTab(Tab: Integer): boolean;
 var
   T: TReflectTimer;
@@ -120,7 +52,11 @@ begin
     Result := Reflect.Gametab.Open(Tab);
 end;
 
-{Simulates a mixture of clicking a tab and using the F keys}
+{
+Simulates a mixture of clicking a tab and using the F keys
+
+Example: Tab(Gametab_Prayer);
+}
 function Tab(i: integer): boolean;
 begin
   If (Not locPlayer.isLoggedIn)or(Failed) then
@@ -129,45 +65,5 @@ begin
   Case Random(8)of
     0: Result := FTab(I);
     1..7: Result := Reflect.GameTab.Open(I);
-  end;
-end;
-
-{Checks if mouse on screen}
-function MouseOnScreen: boolean;
-begin
-  Result := PointInBox(getMousePnt, IntToBox(0, 0, 760, 500));
-end;
-
-{Mouse off screen, if not already}
-procedure mouseOffScreen;
-begin
-  If MouseOnScreen then
-    MMouseOffClient('rand');
-end;
-
-Procedure mightOffScreen;
-begin
-  If Random(10) = 0 then
-    mouseOffScreen;
-end;
-
-procedure beHuman(i: Integer);
-begin
-  If Not MouseOnScreen then
-    Exit;
-
-  Case Random(I)of
-    0..3: mouseOffScreen;
-    4..9: randomCompass;
-    12..16: SleepAndMoveMouse(200+Random(2000));
-  end;
-end;
-
-procedure afterClick;
-begin
-  Case Random(20)of
-    4..9: randomCompass;
-    12..15: SleepAndMoveMouse(200+Random(2000));
-    16..19: mouseOffScreen;
   end;
 end;

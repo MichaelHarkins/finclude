@@ -1,0 +1,7 @@
+const
+  Mail_Username = '';
+  Mail_Password = '';
+  Mail_Name = '';
+  Mail_Recipient = '';
+
+  Mail_URL = 'smtps://smtp.gmail.com';

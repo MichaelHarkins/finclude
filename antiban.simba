@@ -1,3 +1,9 @@
+{
+Generates a human-like movement with the mouse for the given time.
+
+Example: SleepAndMoveMouse(2000+Random(2000));
+  Would move the Mouse around for 2-4 secs.
+}
 procedure SleepAndMoveMouse(Time: Integer);
 var
   Moving: Boolean;
@@ -42,6 +48,12 @@ begin
   until (Abs(GetTickCount - T) >= Time);
 end;
 
+{
+Makes the mouse go off client.
+
+Example: MMouseOffClient('rand');
+  Would move the Mouse go off the client in a random direction.
+}
 procedure MMouseOffClient(Direction: String);
 var
   B: TBoxArray;
@@ -67,4 +79,87 @@ begin
 
   P := Point(RandomRange(B[i].X1, B[i].X2), RandomRange(B[i].Y1, B[i].Y2));
   Reflect.Mouse.Move(P, 0, 0);
+end;
+
+{
+Checks if mouse on screen
+
+Example: If MouseOnScreen then
+           MMouseOffClient('rand');
+}
+function MouseOnScreen: boolean;
+begin
+  Result := PointInBox(getMousePnt, IntToBox(0, 0, 760, 500));
+end;
+
+{
+Checks if the mouse is on screen, if not, moves the mouse out of bounds.
+}
+procedure mouseOffScreen;
+begin
+  If MouseOnScreen then
+    MMouseOffClient('rand');
+end;
+
+{
+Random chance of the mouse going out of bounds.
+}
+Procedure mightOffScreen;
+begin
+  If Random(10) = 0 then
+    mouseOffScreen;
+end;
+
+{
+Moves the compass around without nasty errors. Simple and efficent.
+}
+procedure randomCompass;
+var
+  Keys: TIntegerArray;
+  I: Integer;
+begin
+  If (Not locPlayer.isLoggedIn)or(Failed)then
+    Exit;
+
+  Keys := [VK_RIGHT, VK_LEFT];
+  I := Random(2);
+
+  Wait(100 + random(50));
+  KeyDown(Keys[I]);
+  Wait(500 + random(1000));
+  KeyUp(Keys[I]);
+  Wait(200 + random(350));
+end;
+
+{
+fInclude's antiban function.
+
+Example: beHuman(500);
+  The higher the number the less chance of doing a random action.
+  Best to be used inside of a loop while waiting for a certain condition.
+}
+procedure beHuman(i: Integer);
+begin
+  If Not MouseOnScreen then
+    Exit;
+
+  Case Random(I)of
+    0..3: mouseOffScreen;
+    4..9: randomCompass;
+    12..16: SleepAndMoveMouse(200+Random(2000));
+  end;
+end;
+
+{
+fInclude's afterClick function.
+
+  Execute this after a click to generate a smooth look
+}
+procedure afterClick;
+begin
+  Case Random(20)of
+    4..9: randomCompass;
+    12..15: SleepAndMoveMouse(200+Random(2000));
+    16..19: mouseOffScreen;
+  end;
 end;

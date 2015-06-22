@@ -1,0 +1,19 @@
+function Interface_GetText(Parent, Child: Integer): String;
+var
+  W: TReflectWidget;
+begin
+  W.GetWidget(Parent, Child);
+  Result := W.GetText;
+  W.Free;
+end;
+
+function Interface_GetChildText(Parent, Child, Grandchild: Integer): String;
+var
+  W, WChild: TReflectWidget;
+begin
+  W.GetWidget(Parent, Child);
+  WChild.GetChild(W, Grandchild);
+  Result := WChild.GetText;
+  W.Free;
+  WChild.Free;
+end;

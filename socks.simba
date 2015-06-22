@@ -1,0 +1,25 @@
+const
+  mail_AtTerminate = 1;
+  mail_AtError = 2;
+
+Procedure SendEmail(URL, Email, Password, Name, Recipient, CC, BCC, Subject, Message, Attachment, AttachmentMime: String);
+var
+  Sock: SSLSocket;
+begin
+  Pro_InitSocket(Sock, nil, nil, nil, nil);
+  Pro_CreateSocket(Sock, '');
+  Pro_SetSSL(Sock, false, false, true);
+  Pro_SetVerbose(Sock, true);
+  Pro_SMTP(Sock, PChar(URL), PChar(Email), PChar(Password), PChar(Name), PChar(Recipient), PChar(CC), PChar(BCC), PChar(Subject), PChar(Message), PChar('text/plain; charset=UTF-8'), PChar(Attachment), PChar(AttachmentMime));
+  Pro_FreeSocket(Sock);
+end;
+
+Procedure SendEmail(URL, Email, Password, Name, Recipient, CC, BCC, Subject, Message: String); overload;
+begin
+  SendEmail(URL, Email, Password, Name, Recipient, CC, BCC, Subject, Message, '', '');
+end;
+
+Procedure SendEmail(URL, Email, Password, Name, Recipient, Subject, Message: String); overload;
+begin
+  SendEmail(URL, Email, Password, Name, Recipient, '', '', Subject, Message);
+end;

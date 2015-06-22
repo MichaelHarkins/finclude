@@ -1,15 +1,61 @@
-procedure Debug_screen(log: string);
+{
+fInclude takes pictures when errored.
+You can turn this off by doing
+  fInclude_Pictures = False;
+}
+const
+  fInclude_Pictures = True;
+
+{
+getLocalTime gets the local time of your computer and returns it as a string.
+  Example: Debug(getLocalTime);
+}
+function getLocalTime: string;
+var
+  I: Integer;
+  TimeInts: array[0..3] of UInt16;
 begin
-  if (not directoryExists(ScriptPath + 'debug\')) then
-    forceDirectories(ScriptPath + 'debug\');
+  DecodeTime(Now(), TimeInts[0], TimeInts[1], TimeInts[2], TimeInts[3]);
+  for I := 0 to High(TimeInts)-2 do
+    if I = High(TimeInts)-2 then
+      Result += PadZ(IntToStr(TimeInts[I]), 2)
+    else
+      Result += PadZ(IntToStr(TimeInts[I]), 2) + ':';
+end;
+
+{
+Takes a picture of the screen.
+
+  Example: Debug_screen('We leveled up');
+}
+procedure Debug_screen(log: string; folder: String = 'debug'; useDate: Boolean = True);
+var
+  S: String;
+begin
+  if not fInclude_Pictures then
+    Exit;
+
+  if (not directoryExists(ScriptPath + folder + '\')) then
+    forceDirectories(ScriptPath + folder + '\');
+
+  If useDate then
+    S := Reflect.Time.theDate(DATE_FORMAL) + ', ' + log + '.png'
+  else
+    S := log + '.png'
 
   try
-    saveScreenshot(ScriptPath + 'debug\' + Reflect.Time.theDate(DATE_FORMAL) + ', ' + log + '.png');
+    saveScreenshot(ScriptPath + folder + '\' + S);
   except
     Writeln('Failed to save screenshot of: ' + log);
   end;
 end;
 
+{
+fIncludes debug tool, use this instead of Writeln
+
+If we want to end our scripts we turn Error to True.
+This will also try to take a picture, and turn Failed := True;
+}
 Procedure Debug(Comment: String; Error: Boolean = False);
 var
   S: String;
@@ -22,9 +68,98 @@ begin
   begin
     Debug_screen(Comment);
     S := '[ERROR] ';
+    If Mail_Action = Mail_AtError then
+      SendEmail(Mail_URL,
+            Mail_Username,
+            Mail_Password,
+            Mail_Name,
+            Mail_Recipient,
+            locPlayer.Username,
+            locPlayer.Username + ' has failed. ' + Comment + ' at ' + Reflect.Time.TheDate(DATE_FORMAL) + ' ' + getLocalTime);
+
     ShowBalloonHint(ScriptName, Comment, 10000, bfInfo);
   end else
     S := '[' + Reflect.Time.msToTime(GetTimeRunning, TIME_SHORT) + '] ';
 
   Writeln(S + Comment);
+end;
+
+{
+The procedures bellow is used for debugging tiles.
+  You need SMART enabled in order to see the paint.
+}
+
+
+procedure debug_Tiles(Tiles: TTileArray; S: TStringArray; Color: Integer);
+var
+  I: Integer;
+  P: TPoint;
+begin
+  For I:=0 to High(Tiles)do
+  begin
+    P := Reflect.Tiles.TileToMS(Tiles[I]);
+    If PointInBox(P, IntToBox(MSX1, MSY1, MSX2, MSY2))then
+      If S[I] = '' then
+        Reflect.Smart.Graphics.DrawBox(P.X-2, P.Y-2, P.X+2, P.Y+2, True, Color)
+      else
+        Reflect.Smart.Graphics.DrawClippedText(S[I], 'smallchars07', P, Color);
+  end;
+end;
+
+procedure debug_Tile(Tile: TTile; OffsetX: Integer = 0; OffsetY: Integer = 0; OffsetZ: Integer = 0);
+var
+  P: TPoint;
+begin
+  P := Reflect.Tiles.TileToMS(Tile, OffsetX, OffsetY, OffsetZ);
+  If PointInBox(P, IntToBox(MSX1, MSY1, MSX2, MSY2))then
+    Reflect.Smart.Graphics.DrawCircle(P, 2);
+end;
+
+procedure debug_Objects(Name: String; ObjT: TObjectType);
+var
+  Obj: TReflectObjectArray;
+  I: Integer;
+  T: TTileArray;
+  S: TStringArray;
+begin
+  If Name = '' then
+    Obj.GetAll(ObjT, 20)
+  else
+    Obj.Get(ObjT, Name, 20);
+
+  SetLength(S, Length(Obj));
+  SetLength(T, Length(Obj));
+  For I:=0 to High(Obj)do
+  begin
+    T[I] := Obj[I].GetTile;
+    S[I] := 'Name: ' + Obj[I].GetName + ' - ID: ' + ToStr(Obj[I].GetID) + ' - Tile: ' + ToStr(Obj[I].GetTile);
+    Writeln(S[I]);
+  end;
+
+  debug_Tiles(T, S, clRed);
+end;
+
+procedure debug_PlayerSettings;
+var
+  tInt: TIntegerArray;
+  I, C: Integer;
+begin
+  TInt := Reflect.Misc.GetSettingArray;
+  For I:=0 to High(tInt)do
+    If Not InIntArray([0, -1], tInt[I]) then
+    begin
+      Reflect.Smart.Graphics.DrawClippedText(ToStr(I) + ' - ' + ToStr(tInt[I]), 'SmallChars07', Point(7+((C div 22)*128), 17+((C mod 22)*14)), clRed);
+      Inc(C);
+    end;
+end;
+
+procedure debug_ManyTiledNPC(NPCName: String; OffsetX: Integer = 0; OffsetY: Integer = 0; OffsetZ: Integer = 0);
+var
+  NPCs: TReflectNPCArray;
+  I: Integer;
+begin
+  NPCs.Get(NPCName);
+  For I:=0 to High(NPCs)do
+    If Not NPCs[I].isMoving then
+      debug_Tile(NPCs[I].GetTile, OffsetX, OffsetY, OffsetZ);
 end;

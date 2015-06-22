@@ -1,0 +1,4 @@
+function TileOnMS(Tile: TPoint): Boolean;
+begin
+  Result := PointInBox(Reflect.Tiles.TileToMS(Tile), intToBox(MSX1, MSY1, MSX2, MSY2));
+end;

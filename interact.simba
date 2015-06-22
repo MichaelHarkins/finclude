@@ -1,6 +1,13 @@
 const
   Mouse_MOVE = 3;
 
+procedure quickMouse(P: TPoint; ClickType: Integer);
+begin
+  Reflect.Mouse.Move(P, 0, 0);
+  Wait(RandomRange(20, 30));
+  Reflect.Mouse.Click(ClickType);
+end;
+
 function interact(B: TBox; UpText, Option: String; clickType: Integer): boolean;
 begin
   If (Not locPlayer.isLoggedIn)or(Failed) then
@@ -21,8 +28,8 @@ begin
 
   end else
   begin
-    If Reflect.Text.IsUpText('Walk here')then
-      Exit;
+    If Reflect.Text.IsUpText('Walk here') or (clickType = MOUSE_MOVE) then
+      Exit(False);
     Debug('Looked for "' + UpText + '" in "' + Reflect.Text.GetUpText + '" -> Trying to right click..', False);
     Reflect.Mouse.Move(getMousePnt, 0, 0, Mouse_Right);
     Result := Reflect.Text.ChooseOption(Option, 200+Random(100));
@@ -57,14 +64,14 @@ begin
   end;
 end;
 
-function interactTileOnce(Tile: TPoint; UpText, Option: String; Volume, clickType: Integer; XOffSet: Integer = 0; YOffset: Integer = 0; ZOffset: Integer = 0): boolean;
+function interactTileOnce(Tile: TPoint; UpText, Option: String; Volume, clickType: Integer; XOffSet: Integer = 0; YOffset: Integer = 0; ZOffset: Integer = 0; WalkHandle: Boolean = True): boolean;
 var
   P: TPoint;
 begin
   If (Not locPlayer.isLoggedIn)or(Failed)or(Not TReflectionMap.TileOnMM(Tile))then
     Exit;
 
-  If Not TileOnMS(Tile)then
+  If (Not TileOnMS(Tile))and(WalkHandle)then
   begin
     Debug('Tile not on MS -> Walking..', False);
     locPlayer.WalkToTileMM(Tile);
@@ -75,7 +82,8 @@ begin
   end;
 
   P := TReflectionTiles.TileToMS(Tile, XOffset, YOffset, ZOffSet);
-  If interact(IntToBox(P.X - Volume, P.Y - Volume, P.X + Volume, P.Y + Volume), UpText, Option, clickType)then
+  Reflect.Math.GaussBox(P.X, P.Y, P.X - Volume, P.Y - Volume, P.X + Volume, P.Y + Volume);
+  If interact(P, UpText, Option, clickType)then
   begin
     Exit(True);
     afterClick;
@@ -98,6 +106,16 @@ begin
         randomCompass;
     Inc(C);
   until(C > 10);
+end;
+
+function InteractInvSlot(Slot: Integer; Option: String): boolean;
+var
+  Item: TReflectInvItem;
+begin
+  Item._InvSlot := Slot;
+  Tab(GameTab_Inventory);
+  if Interact(Item.GetPoint, Option, Option, mouse_Left)then
+    Exit(True);
 end;
 
 function interactInv(IDs: TIntegerArray; Option: String): boolean;
@@ -134,7 +152,7 @@ begin
       Debug('Correct name found', False);
       If Not Tab(Gametab_Inventory)then
         Exit;
-      if Interact(Inv[I].GetMSPoint, Option, Option, mouse_Left)then
+      if Interact(Inv[I].GetPoint, Option, Option, mouse_Left)then
         Exit(True);
     end;
 end;

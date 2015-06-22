@@ -1,4 +1,11 @@
-procedure TakeBreak(Time: Integer);
+{
+Takes a break and paints the info on the lobby.
+
+Example: TakeBreak(1000*60, ToStr(TripsDone));
+ Extra string serves as a way to paint output to the user without checking
+ SIMBA's debug.
+}
+procedure TakeBreak(Time: Integer; ExtraString: String = '');
 var
   Bmp, I: Integer;
   Layer: TReflectionGraphics;
@@ -14,7 +21,8 @@ begin
             '',
             'Time running: ' + Reflect.Time.msToTime(GetTimeRunning, TIME_SHORT),
             'Total break was: ' + Reflect.Time.msToTime(Time, TIME_SHORT),
-            'Time left on break: ' + Reflect.Time.msToTime(Time-T.Elapsedtime , TIME_SHORT)];
+            'Time left on break: ' + Reflect.Time.msToTime(Time-T.Elapsedtime , TIME_SHORT),
+            ExtraString];
 
       Layer := Reflect.Smart.Graphics;
       Layer.Clear;
