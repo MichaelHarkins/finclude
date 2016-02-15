@@ -6,12 +6,11 @@ Procedure SendEmail(URL, Email, Password, Name, Recipient, CC, BCC, Subject, Mes
 var
   Sock: SSLSocket;
 begin
-  Pro_InitSocket(Sock, nil, nil, nil, nil);
-  Pro_CreateSocket(Sock, '');
-  Pro_SetSSL(Sock, false, false, true);
-  Pro_SetVerbose(Sock, true);
-  Pro_SMTP(Sock, PChar(URL), PChar(Email), PChar(Password), PChar(Name), PChar(Recipient), PChar(CC), PChar(BCC), PChar(Subject), PChar(Message), PChar('text/plain; charset=UTF-8'), PChar(Attachment), PChar(AttachmentMime));
-  Pro_FreeSocket(Sock);
+  Sock.Init();
+  Sock.SetSecurityPolicy(false, false, true);
+  Sock.SetVerbose(true);
+  Sock.SMTP(PChar(URL), PChar(Email), PChar(Password), PChar(Name), PChar(Recipient), PChar(CC), PChar(BCC), PChar(Subject), PChar(Message), PChar('text/plain; charset=UTF-8'), PChar(Attachment), PChar(AttachmentMime));
+  Sock.Free();
 end;
 
 Procedure SendEmail(URL, Email, Password, Name, Recipient, CC, BCC, Subject, Message: String); overload;
